@@ -12,29 +12,24 @@ public class MyGPS implements GpsNavigator{
     private Map<String,Boolean> isChecked = new HashMap<>();
     private Map<String,Boolean> isRepeated = new HashMap<>();
 
-    public void readData(String filePath) throws IOException{
+    public void readData(String filePath) throws Exception{
         FileReader file = new FileReader(filePath);
         Scanner scanner = new Scanner(file);
         ArrayList<String[]> data = new ArrayList<>();
         String str;
-        while(scanner.hasNextLine())
-        {
+        while(scanner.hasNextLine())        {
             str = scanner.nextLine();
-            if(!str.matches("\\w+\\s\\w+\\s\\d+\\s\\d+\\s*$"))
-            {
-                throw(new IOException("Invalid file format"));
+            if(!str.matches("\\w+\\s\\w+\\s\\d+\\s\\d+\\s*$"))            {
+                throw(new Exception("Invalid file format"));
             }
             data.add(str.split(" "));
         }
-        for(int i = 0; i < data.size(); i++)
-        {
-            if(!points.containsKey(data.get(i)[0]))
-            {
+        for(int i = 0; i < data.size(); i++)        {
+            if(!points.containsKey(data.get(i)[0]))            {
                 points.put(data.get(i)[0], new ArrayList<Road>());
                 paths.put(data.get(i)[0], new Path(new ArrayList<String>(), -1));
             }
-            if(!points.containsKey(data.get(i)[1]))
-            {
+            if(!points.containsKey(data.get(i)[1])) {
                 points.put(data.get(i)[1], new ArrayList<Road>());
                 paths.put(data.get(i)[1], new Path(new ArrayList<String>(), -1));
             }
@@ -45,11 +40,6 @@ public class MyGPS implements GpsNavigator{
 
     @Override
     public Path findPath(String pointA, String pointB) throws Exception{
-        if(!points.containsKey(pointA) || !points.containsKey(pointB))
-        {
-            throw(new Exception("Invalid point"));
-        }
-
         for (Map.Entry<String, Path> entry : paths.entrySet()) {
             entry.setValue(new Path(new ArrayList<String>(), -1));
             isChecked.put(entry.getKey(), false);
@@ -66,12 +56,10 @@ public class MyGPS implements GpsNavigator{
             for (int i = 0; i < size; i++) {
                 if (paths.get(roads.get(i).destination).cost == -1
                         || paths.get(roads.get(i).destination).cost >= paths.get(currentPoint).cost + roads.get(i).getCost()) {
-                    if(paths.get(roads.get(i).destination).cost > paths.get(currentPoint).cost + roads.get(i).getCost() || paths.get(roads.get(i).destination).cost == -1)
-                    {
+                    if(paths.get(roads.get(i).destination).cost > paths.get(currentPoint).cost + roads.get(i).getCost() || paths.get(roads.get(i).destination).cost == -1) {
                         isRepeated.put(roads.get(i).destination, false);
                     }
-                    else
-                    {
+                    else  {
                         isRepeated.put(roads.get(i).destination, true);
                     }
 
@@ -89,18 +77,14 @@ public class MyGPS implements GpsNavigator{
                     currentPoint = entry.getKey();
                 }
             }
-            if (currentPoint == oldPoint)
-            {
+            if (currentPoint == oldPoint) {
                 throw(new Exception("No path"));
             }
-            if(currentPoint.equals(pointB))
-            {
+            if(currentPoint.equals(pointB)) {
                 Path resultPath = paths.get(pointB);
                 for (Map.Entry<String, Boolean> entry : isRepeated.entrySet()) {
-                    if(entry.getValue())
-                    {
-                        if(resultPath.path.contains(entry.getKey()))
-                        {
+                    if(entry.getValue())                    {
+                        if(resultPath.path.contains(entry.getKey())) {
                             throw(new Exception("More than one path found"));
                         }
                     }
